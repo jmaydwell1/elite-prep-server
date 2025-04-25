@@ -25,8 +25,15 @@ app.add_middleware(
 )
 
 # MongoDB connection
-uri = "mongodb+srv://eliteprep:test@cluster0.vlsnw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tlsAllowInvalidCertificates=true&ssl=true"
-client = MongoClient(uri, server_api=ServerApi('1'))
+uri = "mongodb+srv://eliteprep:test@cluster0.vlsnw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tlsAllowInvalidCertificates=true&ssl=true&tlsInsecure=true&directConnection=true"
+client = MongoClient(
+    uri,
+    server_api=ServerApi('1'),
+    tls=True,
+    tlsAllowInvalidCertificates=True,
+    tlsInsecure=True,
+    directConnection=True
+)
 db = client.eliteprep  # database name
 
 # OpenAI client initialization
