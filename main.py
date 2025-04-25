@@ -31,7 +31,7 @@ db = client.eliteprep  # database name
 
 # OpenAI client initialization
 client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+    api_key="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"
 )
 
 class OnboardingData(BaseModel):
