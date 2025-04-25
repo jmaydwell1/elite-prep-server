@@ -28,12 +28,9 @@ app.add_middleware(
 uri = "mongodb+srv://eliteprep:test@cluster0.vlsnw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(
     uri,
-    server_api=ServerApi('1'),
     tls=True,
     tlsAllowInvalidCertificates=True,
-    connectTimeoutMS=30000,
-    socketTimeoutMS=30000,
-    maxPoolSize=50
+    tlsAllowInvalidHostnames=True
 )
 db = client.eliteprep  # database name
 
