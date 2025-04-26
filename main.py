@@ -9,6 +9,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
+
 # Load environment variables from .env file
 load_dotenv()
 print("API Key loaded:", os.getenv("OPENAI_API_KEY") is not None)  # Debug print
@@ -36,7 +37,7 @@ db = client.eliteprep  # database name
 
 # OpenAI client initialization
 client = OpenAI(
-    api_key="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"
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
 class OnboardingData(BaseModel):
@@ -87,6 +88,9 @@ class User(BaseModel):
     password: str
     onboarding_data: Optional[OnboardingData] = None
     performance_trends: List[PerformanceTrends] = []
+
+class PromptRequest(BaseModel):
+    prompt: str
 
 @app.post("/register")
 async def register_user(user: UserCreate):
@@ -212,6 +216,35 @@ async def get_performance_averages(email: EmailStr):
         print(f"Error type: {type(e)}")
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/generate")
+async def generate_content(request: PromptRequest):
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user", "content": request.prompt}
+            ]
+        )
+        
+        # Get the response text
+        response_text = completion.choices[0].message.content
+        
+        # Format the response with proper paragraph structure
+        paragraphs = response_text.split('\n\n')  # Split into paragraphs
+        formatted_paragraphs = [p.strip() for p in paragraphs if p.strip()]  # Remove empty paragraphs
+        
+        # Format the response
+        formatted_response = {
+            "response": response_text,
+            "formatted_response": '<br><br>'.join(formatted_paragraphs),  # Add double line breaks between paragraphs
+            "raw_text": response_text.strip(),  # Clean version without extra whitespace
+            "paragraphs": formatted_paragraphs  # Array of individual paragraphs
+        }
+        
+        return formatted_response
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
